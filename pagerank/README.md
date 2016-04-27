@@ -38,30 +38,30 @@ To run on the subset of wikipedia that has 'ball' on the cluster run:
 ### Extract Links
 Initially run on a small file locally. This will save the output to hdfs in your directory.
 
-  pyspark links.py local hdfs:///tmp/wiki/wiki_page_per_line_small.txt
+    links.py local hdfs:///tmp/wiki/wiki_page_per_line_small.txt
 
 You should see the following output:
 
-  hadoop fs -cat /path/link_index/*
+    hadoop fs -cat /path/link_index/*
 
 #### Delete
 You can delete the output with:
 
-  hadoop fs -rm -f -R /path/link_index
+    hadoop fs -rm -f -R /path/link_index
 
 To run on the subset of wikipedia that has 'ball' on the cluster run:
 
-  pyspark links.py cluster hdfs:///tmp/wiki/wiki_page_per_line_ball.txt
+    pyspark links.py cluster hdfs:///tmp/wiki/wiki_page_per_line_ball.txt
 
 ### Calculate Term Frequency - Inverse Document Frequency
 
   Identify important words in a page.
 
-      pyspark tfidf.py cluster
+    pyspark tfidf.py cluster
 
   You can view the output with:
 
-      hadoop fs -cat /path/tf_idf/* | less
+    hadoop fs -cat /path/tf_idf/* | less
 
   Sample output looks like:
 
