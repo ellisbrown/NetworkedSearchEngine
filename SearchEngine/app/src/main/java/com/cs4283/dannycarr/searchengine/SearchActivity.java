@@ -222,11 +222,11 @@ public class SearchActivity extends AppCompatActivity {
 
                 int resCount = 0;
                 for (String result : results) {
-                    Log.i(TAG, result);
-
+                    if (result.startsWith("\"")) {
+                        result = result.substring(1);
+                    }
                     String[] commas = result.split(",");
 
-                    System.out.println(result);
                     final String url = commas[1];
                     Button link = new Button(getApplicationContext());
                     link.setOnClickListener(new View.OnClickListener() {

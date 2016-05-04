@@ -1,11 +1,10 @@
-# Echo server program
 import socket
 import sys
 import json
 from run_search import search
 
-#HOST = None              # Symbolic name meaning all available interfaces
-HOST = 'localhost' # for testing
+HOST = None              # Symbolic name meaning all available interfaces
+#HOST = 'localhost' # for testing
 PORT = 20000
 s = None
 
@@ -35,8 +34,8 @@ def establishConnection():
 
 def main():
     conn,addr = establishConnection()
-    conn.send("Search for terms on wikipedia\n" +
-              ".............................\n")
+    #conn.send("Search for terms on wikipedia\n" +
+     #         ".............................\n")
     while 1: # connected
         data = conn.recv(1024)
         if not data: break
