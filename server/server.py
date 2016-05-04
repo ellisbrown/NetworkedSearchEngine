@@ -46,8 +46,7 @@ def main():
         data = data.strip()
         if data.lower() == "q": break
         print 'Client is searching for "' + data + '"'
-        #sh = search(data)
-        sh = [s[:-1] for s in search(data)]
+        sh = search(data)
         print "Sending results to client"
         conn.send(json.dumps(sh) + "\n")
     print "Terminating connection"
