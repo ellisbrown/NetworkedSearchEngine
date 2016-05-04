@@ -1,11 +1,11 @@
-import sys
+simport sys
 
 from pyspark import SparkConf, SparkContext
 
-from variables import MACHINE, VUID, PAGE_TABLE, INDEX_TABLE, COLUMN_FAMILY, COLUMN
+from variables import MACHINE, BUCKET, PAGE_TABLE, INDEX_TABLE, COLUMN_FAMILY, COLUMN
 
-link_file = 'hdfs:///user/%s/link_index' % VUID
-rank_file = 'hdfs:///user/%s/ranks' % VUID
+link_file = BUCKET + 'link_index'
+rank_file = BUCKET + 'ranks'
 
 
 '''
@@ -49,14 +49,6 @@ def computeContribs(urls, rank):
         yield (url, rank / num_urls)
 
 if __name__ == '__main__':
-    conf = SparkConf()
-    if sys.argv[1] == 'local':
-        conf.setMaster("local[3]")
-        print 'Running locally'
-    elif sys.argv[1] == 'cluster':
-        conf.setMaster("spark://10.0.22.241:7077")
-        print 'Running on cluster'
-    conf.set("spark.executor.memory", "10g")
-    conf.set("spark.driver.memory", "10g")
-    spark = SparkContext(conf = conf)
-    page_rank(spark, int(sys.argv[2]))
+    spark = SparkContext(appName='pagerank')
+    page_rank(spark, 10)
+    spark.stop()

@@ -4,10 +4,10 @@ import happybase
 import sys
 import json
 
-from variables import MACHINE, VUID, PAGE_TABLE, INDEX_TABLE, COLUMN_FAMILY, COLUMN
+from variables import MACHINE, PAGE_TABLE, INDEX_TABLE, COLUMN_FAMILY, COLUMN
 
-tf_idf_files = 'hdfs:///user/%s/tf_idf/*' % VUID
-rank_files = 'hdfs:///user/%s/ranks/*' % VUID
+tf_idf_files = 's3://networks-final/tf_idf/*'
+rank_files = 's3://networks-final/ranks/*'
 
 
 '''
@@ -65,7 +65,7 @@ Create a data dictionary:
 Use json.dumps(data) as the value to put into hbase.
 '''
 def store(word, info_list):
-    connection = happybase.Connection(MACHINE + '.vampire', table_prefix=VUID)
+    connection = happybase.Connection(MACHINE)
     table = connection.table(INDEX_TABLE)
     b = table.batch()
 
@@ -82,14 +82,6 @@ def store(word, info_list):
 
 
 if __name__ == '__main__':
-    conf = SparkConf()
-    if sys.argv[1] == 'local':
-        conf.setMaster("local[3]")
-        print 'Running locally'
-    elif sys.argv[1] == 'cluster':
-        conf.setMaster("spark://10.0.22.241:7077")
-        print 'Running on cluster'
-    conf.set("spark.executor.memory", "10g")
-    conf.set("spark.driver.memory", "10g")
-    spark = SparkContext(conf = conf)
+    spark = SparkContext(appName='hbase')
     hbase(spark)
+    spark.stop()

@@ -1,11 +1,11 @@
 from pyspark import SparkConf, SparkContext
 
-from variables import MACHINE, VUID, PAGE_TABLE, INDEX_TABLE, COLUMN_FAMILY, COLUMN
+from variables import MACHINE, BUCKET, PAGE_TABLE, INDEX_TABLE, COLUMN_FAMILY, COLUMN
 
 import sys
 
-index_file = 'hdfs:///user/%s/word_index/*' % VUID
-tf_idf_file = 'hdfs:///user/%s/tf_idf/' % VUID
+index_file = BUCKET + 'word_index/*'
+tf_idf_file = BUCKET + 'tf_idf'
 
 
 '''
@@ -79,14 +79,6 @@ def split_input(line):
 
 
 if __name__ == '__main__':
-    conf = SparkConf()
-    if sys.argv[1] == 'local':
-        conf.setMaster("local[3]")
-        print 'Running locally'
-    elif sys.argv[1] == 'cluster':
-        conf.setMaster("spark://10.0.22.241:7077")
-        print 'Running on cluster'
-    conf.set("spark.executor.memory", "10g")
-    conf.set("spark.driver.memory", "10g")
-    spark = SparkContext(conf = conf)
+    spark = SparkContext(appName='tfidf')
     tf_idf(spark)
+    spark.stop()

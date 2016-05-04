@@ -5,7 +5,6 @@ import operator
 
 from variables import MACHINE, VUID, PAGE_TABLE, INDEX_TABLE, COLUMN_FAMILY, COLUMN
 
-## use row to get each row, go into each row, count up the results
 
 '''
 Get top K pages for given keyword search.
@@ -31,23 +30,38 @@ Note that the every keyword must occur in a given page to be in the result.
 '''
 def search(keywords):
     print 'Searching for %s' % keywords
-    W = 4
+    W = 7
     TOP_K = 10
 
-    connection = happybase.Connection(MACHINE + '.vampire', table_prefix=VUID)
+    connection = happybase.Connection('ec2-52-207-255-157.compute-1.amazonaws.com')
+    #connection = happybase.Connection(MACHINE + '.vampire', table_prefix=VUID)
     table = connection.table(INDEX_TABLE)
+
     rows = table.rows(keywords)
+
     ts = {}
+
     for key, data in rows:
-        for element in data.values():
-            jdata = json.loads(element)
+        for e in data.values():
+            jdata = json.loads(e)
 
             tfidf = jdata["tfidf"]
             pr = jdata["pr"]
             title = jdata["title"]
 
-            score = tfidf + W * pr
+            score = tfidf / 3 + W * pr
+            
+            #kiddie heuristics
+            keys = " ".join(keywords).strip()
 
+            if keys == title:
+                score *= 100
+             
+            keywords = [word[:-1] if word[-1] == 's' else word for word in keywords]
+            for word in keywords:    
+                if word in title:
+                    score *= 10
+            
             if title in ts:
                 # multiple keywords for this page
                 ts[title] += score
@@ -56,6 +70,8 @@ def search(keywords):
                 ts[title] = score
 
     pages = []
+    #could do scores and titles in one pass but I like this list comp
+    
     for key, data in rows:
         key_pages = [json.loads(e)["title"] for e in data.values()]
         pages.append(key_pages)
@@ -64,13 +80,13 @@ def search(keywords):
         return []
 
     common_pages = list(set(pages[0]).intersection(*pages))
-    arr = []
+
+    ret = []
     for page in common_pages:
-        arr.append((ts[page], page))
+        ret.append((page, ts[page]))
 
-    arr.sort(key=operator.itemgetter(0))
-    return arr[::-1][:TOP_K]
-
+    ret.sort(key=operator.itemgetter(1))
+    return ret[::-1][:10]
 
 if __name__ == '__main__':
     keywords = sys.argv[1:]
