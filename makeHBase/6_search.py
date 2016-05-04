@@ -3,7 +3,7 @@ import sys
 import json
 import operator
 
-from variables import MACHINE, VUID, PAGE_TABLE, INDEX_TABLE, COLUMN_FAMILY, COLUMN
+from variables import MACHINE, PAGE_TABLE, INDEX_TABLE, COLUMN_FAMILY, COLUMN
 
 
 '''
@@ -50,18 +50,18 @@ def search(keywords):
             title = jdata["title"]
 
             score = tfidf / 3 + W * pr
-            
+
             #kiddie heuristics
             keys = " ".join(keywords).strip()
 
             if keys == title:
                 score *= 100
-             
+
             keywords = [word[:-1] if word[-1] == 's' else word for word in keywords]
-            for word in keywords:    
+            for word in keywords:
                 if word in title:
                     score *= 10
-            
+
             if title in ts:
                 # multiple keywords for this page
                 ts[title] += score
@@ -71,7 +71,7 @@ def search(keywords):
 
     pages = []
     #could do scores and titles in one pass but I like this list comp
-    
+
     for key, data in rows:
         key_pages = [json.loads(e)["title"] for e in data.values()]
         pages.append(key_pages)

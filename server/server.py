@@ -1,6 +1,8 @@
 # Echo server program
 import socket
 import sys
+import json
+from run_search import search
 
 #HOST = None              # Symbolic name meaning all available interfaces
 HOST = 'localhost' # for testing
@@ -33,12 +35,22 @@ def establishConnection():
 
 def main():
     conn,addr = establishConnection()
+    conn.send("Search for terms on wikipedia\n" +
+              ".............................\n")
     while 1: # connected
         data = conn.recv(1024)
         if not data: break
-        call("")
-        print data
-        conn.send(data)
+        if data == "\n":
+            print "."
+            continue
+        data = data.strip()
+        if data.lower() == "q": break
+        print 'Client is searching for "' + data + '"'
+        #sh = search(data)
+        sh = [s[:-1] for s in search(data)]
+        print "Sending results to client"
+        conn.send(json.dumps(sh) + "\n")
+    print "Terminating connection"
     conn.close()
 
 if __name__ == '__main__':
